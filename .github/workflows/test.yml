@@ -25,7 +25,8 @@ jobs:
             torchvision-version: 0.11.2
     steps:
       - uses: conda-incubator/setup-miniconda@v2
-      - run: pip install -n test python=${{ matrix.python-version }} pytorch=${{ matrix.pytorch-version }} torchvision=${{ matrix.torchvision-version }} cpuonly -c pytorch
+      # - run: conda install -n test python=${{ matrix.python-version }} pytorch=${{ matrix.pytorch-version }} torchvision=${{ matrix.torchvision-version }} cpuonly -c pytorch
+      - run: pip install torch==${{ matrix.pytorch-version }} torchvision==${{ matrix.torchvision-version }}
       - uses: actions/checkout@v2
       - run: echo "$CONDA/envs/test/bin" >> $GITHUB_PATH
       - run: pip install pytest
