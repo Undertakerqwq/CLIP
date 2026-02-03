@@ -27,16 +27,14 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
       # - run: conda install -n test python=${{ matrix.python-version }} pytorch=${{ matrix.pytorch-version }} torchvision=${{ matrix.torchvision-version }} cpuonly -c pytorch
         with:
-          # 1. 明确创建并激活名为 “test” 的环境
           activate-environment: test
-          # 2. 明确指定 Python 3.8
           python-version: 3.8
-
-      # 3. 核心：使用 conda 安装，并固定 MKL 版本
-      - run: |
-          conda install -n test pytorch==${{ matrix.pytorch-version }} torchvision==${{ matrix.torchvision-version }} cpuonly -c pytorch
-          # 安装完成后，立刻将 mkl 降级到 2023 年之前的兼容版本
-          conda install -n test mkl=2022.* -c intel --force-reinstall
+      # 1. 清理环境中可能残留的旧“intel”频道配置
+      - run: conda config --remove channels intel || true
+      # 2. 安装PyTorch和Torchvision (关键：不加 -c intel)
+      - run: conda install -n test pytorch==${{ matrix.pytorch-version }} torchvision==${{ matrix.torchvision-version }} cpuonly -c pytorch
+      # 3. 使用新的、有效的Intel频道安装旧版MKL
+      - run: conda install -n test mkl=2022.* -c https://software.repos.intel.com/python/conda/ --override-channels
       - uses: actions/checkout@v2
       - run: echo "$CONDA/envs/test/bin" >> $GITHUB_PATH
       - run: pip install pytest
