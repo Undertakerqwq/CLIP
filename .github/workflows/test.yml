@@ -26,7 +26,17 @@ jobs:
     steps:
       - uses: conda-incubator/setup-miniconda@v2
       # - run: conda install -n test python=${{ matrix.python-version }} pytorch=${{ matrix.pytorch-version }} torchvision=${{ matrix.torchvision-version }} cpuonly -c pytorch
-      - run: pip install "torch~=1.7.0" "torchvision~=0.8.0" -f https://download.pytorch.org/whl/torch_stable.html
+        with:
+          # 1. 明确创建并激活名为 “test” 的环境
+          activate-environment: test
+          # 2. 明确指定 Python 3.8
+          python-version: 3.8
+
+      # 3. 核心：使用 conda 安装，并固定 MKL 版本
+      - run: |
+          conda install -n test pytorch==${{ matrix.pytorch-version }} torchvision==${{ matrix.torchvision-version }} cpuonly -c pytorch
+          # 安装完成后，立刻将 mkl 降级到 2023 年之前的兼容版本
+          conda install -n test mkl=2022.* -c intel --force-reinstall
       - uses: actions/checkout@v2
       - run: echo "$CONDA/envs/test/bin" >> $GITHUB_PATH
       - run: pip install pytest
