@@ -29,12 +29,7 @@ jobs:
         with:
           activate-environment: test
           python-version: 3.8
-      # 1. 清理环境中可能残留的旧“intel”频道配置
-      - run: conda config --remove channels intel || true
-      # 2. 安装PyTorch和Torchvision (关键：不加 -c intel)
-      - run: conda install -n test pytorch==${{ matrix.pytorch-version }} torchvision==${{ matrix.torchvision-version }} cpuonly -c pytorch
-      # 3. 使用新的、有效的Intel频道安装旧版MKL
-      - run: conda install -n test mkl=2022.* -c https://software.repos.intel.com/python/conda/ --override-channels
+      - run: conda install -n test python=3.8 pytorch==${{ matrix.pytorch-version }} torchvision==${{ matrix.torchvision-version }} cpuonly numpy=1.19 -c pytorch
       - uses: actions/checkout@v2
       - run: echo "$CONDA/envs/test/bin" >> $GITHUB_PATH
       - run: pip install pytest
